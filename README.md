@@ -1,186 +1,122 @@
-# IBAC - Identity-Based Access Control System
+# Identity-Based Access Control (IBAC) System
 
-A secure, blockchain-based access control system that implements identity-based authentication and encryption for data protection.
+A secure, blockchain-based access control system that implements role-based access control (RBAC) and identity-based access control (IBAC) using smart contracts and AES encryption.
 
 ## Features
 
-- Wallet Integration with MetaMask
-- Identity-Based Authentication
-- AES-256-CBC Data Encryption
-- Role-Based Access Control
-- Session Management
-- Secure Data Transmission
+### Smart Contract Features
+- **Role-Based Access Control**
+  - Patient: Basic access to personal data
+  - Doctor: Full access to patient data, can add new users
+  - Nurse: Limited access to patient data
+- **Security Levels**
+  - Confidential: Basic security level
+  - Secret: Medium security level
+  - TopSecret: Highest security level
+- **Session Management**
+  - Time-based session expiration
+  - Secure session validation
+  - Automatic session termination
+- **Access Control Lists**
+  - Resource-level access control
+  - Role-based permissions
+  - Security level restrictions
 
-## Architecture
+### Frontend Features
+- **Wallet Integration**
+  - MetaMask support
+  - Automatic network detection
+  - Account change handling
+- **Data Encryption**
+  - AES-256-CBC encryption
+  - Secure key management
+  - IV generation for each encryption
+- **User Interface**
+  - Role-based dashboard
+  - Security level indicators
+  - Access control management
+  - Session management
+
+## Technical Architecture
 
 ### Smart Contract (IBAC.sol)
-The core of the system is the IBAC smart contract, which handles:
-- User registration and authentication
-- Session management
-- Data encryption and storage
-- Access control mechanisms
-- Resource management
+```solidity
+// Core Data Structures
+struct User {
+    bool isRegistered;
+    bool isActive;
+    Role role;
+    SecurityLevel securityLevel;
+    string encryptedPrivateKey;
+}
+
+struct Resource {
+    string encryptedContent;
+    string encryptedIV;
+    SecurityLevel securityLevel;
+    mapping(address => bool) accessList;
+}
+```
 
 ### Frontend Components
-- React-based user interface
-- Web3 integration
-- AES encryption implementation
-- Session management
-- Access control interface
-
-## Prerequisites
-
-- Node.js (v14 or higher)
-- MetaMask browser extension
-- Sepolia testnet ETH for gas fees
-
-## Setup Instructions
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd lbac-frontend
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server**
-   ```bash
-   npm start
-   ```
-
-4. **Connect MetaMask**
-   - Install MetaMask browser extension
-   - Connect to Sepolia testnet
-   - Ensure you have test ETH for gas fees
-
-## How It Works
-
-### 1. Authentication Flow
-1. User connects their MetaMask wallet
-2. System generates a nonce and timestamp
-3. User signs a message containing their address, nonce, and timestamp
-4. Smart contract verifies the signature and authenticates the user
-5. Session is created with a configurable duration
-
-### 2. Data Storage
-1. User provides data and resource name
-2. Frontend encrypts data using AES encryption
-3. Encrypted data and initialization vector (IV) are stored on-chain
-4. Access control is managed through the smart contract
-
-### 3. Access Control
-1. Resource owner grants access to other users
-2. Access rights are stored on-chain
-3. Users can only access resources they have permission for
-4. Access can be revoked at any time
-
-### 4. Session Management
-1. Sessions have a configurable duration
-2. Users can extend their session
-3. Sessions automatically expire after the duration
-4. Users must re-authenticate after session expiration
+- **Web3Context.js**: Manages blockchain interactions and encryption
+- **Dashboard.js**: Role-based user interface
+- **App.css**: Styled components and security indicators
 
 ## Security Features
 
-### Data at Rest
-- AES encryption for stored data
-- Secure key management
-- Access control lists
-
-### Data in Transit
-- TLS/HTTPS for all communications
-- Secure WebSocket connections
-- Encrypted API calls
-
-### Authentication
-- ECDSA signatures for user verification
-- Nonce-based authentication
-- Session management
-- Automatic session expiration
-
-## Smart Contract Functions
+### Data Protection
+1. **Encryption**
+   - AES-256-CBC for data encryption
+   - Unique IV for each encryption
+   - Secure key storage
+2. **Access Control**
+   - Role-based permissions
+   - Security level restrictions
+   - Resource-level access lists
 
 ### Authentication
-- `registerUser()`: Register a new user
-- `verifyCredentials()`: Authenticate user with ECDSA signature
-- `isAuthenticated()`: Check user authentication status
-- `endSession()`: End user session
+1. **Wallet Authentication**
+   - ECDSA signature verification
+   - Nonce-based authentication
+   - Session management
+2. **Role Management**
+   - Doctor: Can add patients and nurses
+   - Nurse: Limited access to patient data
+   - Patient: Access to personal data only
 
-### Data Management
-- `encryptAndStoreData()`: Store encrypted data
-- `getResourceData()`: Retrieve encrypted data
-- `grantAccess()`: Grant access to another user
-- `revokeAccess()`: Revoke user access
-- `getUserKey()`: Get encrypted key for resource
+## Setup Instructions
 
-## Frontend Components
+1. **Prerequisites**
+   ```bash
+   Node.js >= 14.0.0
+   MetaMask browser extension
+   Testnet ETH (Sepolia)
+   ```
 
-### Web3Context
-- Manages wallet connection
-- Handles contract interactions
-- Manages authentication state
-- Provides encryption utilities
+2. **Installation**
+   ```bash
+   # Clone the repository
+   git clone <repository-url>
+   cd lbac-frontend
 
-### Components
-- `Navbar`: Wallet connection and navigation
-- `Home`: Authentication and welcome screen
-- `Dashboard`: Data management and access control
+   # Install dependencies
+   npm install
 
-## Best Practices
+   # Create environment file
+   cp .env.example .env
+   ```
 
-1. **Security**
-   - Never store private keys in the frontend
-   - Always use HTTPS
-   - Implement proper error handling
-   - Validate all user inputs
+3. **Environment Configuration**
+   ```env
+   REACT_APP_CONTRACT_ADDRESS=your_contract_address
+   REACT_APP_NETWORK_ID=11155111 # Sepolia
+   ```
 
-2. **Performance**
-   - Optimize gas usage
-   - Implement proper caching
-   - Use efficient data structures
-
-3. **User Experience**
-   - Provide clear error messages
-   - Implement loading states
-   - Add transaction confirmations
-
-## Troubleshooting
-
-### Common Issues
-1. **MetaMask Connection**
-   - Ensure MetaMask is installed
-   - Check if you're on the correct network
-   - Verify you have sufficient ETH for gas
-
-2. **Authentication**
-   - Check if your session has expired
-   - Verify your signature
-   - Ensure you have the correct permissions
-
-3. **Transaction Failures**
-   - Check gas limits
-   - Verify contract address
-   - Ensure sufficient ETH balance
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Contact
-
-For any questions or support, please open an issue in the repository.
+4. **Start Development Server**
+   ```bash
+   npm start
+   ```
 
 ## Contract Deployment and Frontend Connection
 
@@ -308,68 +244,74 @@ For any questions or support, please open an issue in the repository.
    - Test all functionality
    - Deploy new version
 
-## Smart Contract Security Features
+## Usage Guide
 
-### 1. Access Control and Authentication
-- **ECDSA Signature Verification**
-  - Users must sign messages with their private key
-  - Prevents unauthorized access and impersonation
-  - Nonce-based authentication to prevent replay attacks
-  ```solidity
-  function verifyCredentials(address user, bytes memory signature, uint256 nonce) public {
-      bytes32 message = keccak256(abi.encodePacked(user, nonce, block.timestamp));
-      require(ECDSA.recover(message, signature) == user, "Invalid signature");
-      // ... authentication logic
-  }
-  ```
+### For Doctors
+1. Connect wallet
+2. Register as doctor
+3. Add patients and nurses
+4. Manage access control
+5. Store encrypted data
 
-- **Role-Based Access Control**
-  - Granular permissions for different user roles
-  - Resource-level access control
-  - Owner-only administrative functions
-  ```solidity
-  mapping(address => mapping(string => bool)) private accessControl;
-  mapping(address => bool) private isAdmin;
-  ```
+### For Nurses
+1. Connect wallet
+2. Wait for doctor to add you
+3. Access authorized patient data
+4. Update patient records
 
-### 2. Session Management
-- **Time-Based Session Expiration**
-  - Configurable session duration
-  - Automatic session termination
-  - Session extension mechanism
-  ```solidity
-  uint256 public constant SESSION_DURATION = 1 hours;
-  mapping(address => uint256) private sessionExpiry;
-  ```
+### For Patients
+1. Connect wallet
+2. Register as patient
+3. Access personal data
+4. View access history
 
-- **Session Validation**
-  - Checks for active sessions
-  - Prevents expired session access
-  - Automatic session cleanup
-  ```solidity
-  modifier validSession() {
-      require(sessionExpiry[msg.sender] > block.timestamp, "Session expired");
-      _;
-  }
-  ```
+## Security Best Practices
 
-### 3. Data Protection
-- **Encrypted Data Storage**
-  - On-chain storage of encrypted data
-  - Secure key management
-  - Initialization vector (IV) for encryption
-  ```solidity
-  struct EncryptedData {
-      bytes32 encryptedContent;
-      bytes32 iv;
-      uint256 timestamp;
-      address encryptedBy;
-  }
-  mapping(string => EncryptedData) private resources;
-  ```
+1. **Key Management**
+   - Never store private keys in plain text
+   - Use secure key storage methods
+   - Implement key rotation
 
-- **Access Control Lists**
-  - Resource-level permissions
-  - Granular access management
-  - Access revocation capability
-  ```
+2. **Access Control**
+   - Follow principle of least privilege
+   - Regular access review
+   - Immediate revocation of access
+
+3. **Data Protection**
+   - Encrypt all sensitive data
+   - Use unique IVs
+   - Implement proper key management
+
+## Troubleshooting
+
+### Common Issues
+1. **Wallet Connection**
+   - Ensure MetaMask is installed
+   - Check network configuration
+   - Verify account permissions
+
+2. **Transaction Failures**
+   - Check gas limits
+   - Verify account balance
+   - Ensure proper permissions
+
+3. **Access Denied**
+   - Verify role permissions
+   - Check security level
+   - Confirm access list membership
+
+## Contributing
+
+1. Fork the repository
+2. Create feature branch
+3. Commit changes
+4. Push to branch
+5. Create pull request
+
+## License
+
+MIT License - See LICENSE file for details
+
+## Support
+
+For support, please open an issue in the repository or contact the development team.

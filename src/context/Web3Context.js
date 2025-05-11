@@ -7,12 +7,27 @@ const Web3Context = createContext();
 
 export const useWeb3 = () => useContext(Web3Context);
 
+// Role and Security Level enums matching the smart contract
+export const Role = {
+    Patient: 0,
+    Doctor: 1,
+    Nurse: 2
+};
+
+export const SecurityLevel = {
+    Confidential: 0,
+    Secret: 1,
+    TopSecret: 2
+};
+
 export const Web3Provider = ({ children }) => {
     const [account, setAccount] = useState(null);
     const [contract, setContract] = useState(null);
     const [provider, setProvider] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isConnecting, setIsConnecting] = useState(false);
+    const [userRole, setUserRole] = useState(null);
+    const [userSecurityLevel, setUserSecurityLevel] = useState(null);
 
     const contractAddress = "0xd9145CCE52D386f254917e481eB44e9943F39138";
 
@@ -93,8 +108,13 @@ export const Web3Provider = ({ children }) => {
             );
             setContract(contract);
 
-            const isUserAuthenticated = await contract.isAuthenticated(accounts[0]);
-            setIsAuthenticated(isUserAuthenticated);
+            // Check if user is registered
+            const user = await contract.users(accounts[0]);
+            if (user.isRegistered) {
+                setIsAuthenticated(user.isActive);
+                setUserRole(user.role);
+                setUserSecurityLevel(user.securityLevel);
+            }
 
         } catch (error) {
             console.error("Error connecting wallet:", error);
@@ -153,7 +173,61 @@ export const Web3Provider = ({ children }) => {
         }
     };
 
-    const encryptAndStoreData = async (resource, data) => {
+    const registerUser = async () => {
+        if (!contract || !account) {
+            alert("Please connect your wallet first!");
+            return false;
+        }
+
+        try {
+            const tx = await contract.registerUser();
+            await tx.wait();
+            alert("Successfully registered as a Patient!");
+            return true;
+        } catch (error) {
+            console.error("Error registering user:", error);
+            alert("Registration failed. Please try again.");
+            return false;
+        }
+    };
+
+    const addPatient = async (patientAddress) => {
+        if (!contract || !isAuthenticated || userRole !== Role.Doctor) {
+            alert("Only doctors can add patients!");
+            return false;
+        }
+
+        try {
+            const tx = await contract.addPatient(patientAddress);
+            await tx.wait();
+            alert("Successfully added new patient!");
+            return true;
+        } catch (error) {
+            console.error("Error adding patient:", error);
+            alert("Failed to add patient. Please try again.");
+            return false;
+        }
+    };
+
+    const addNurse = async (nurseAddress) => {
+        if (!contract || !isAuthenticated || userRole !== Role.Doctor) {
+            alert("Only doctors can add nurses!");
+            return false;
+        }
+
+        try {
+            const tx = await contract.addNurse(nurseAddress);
+            await tx.wait();
+            alert("Successfully added new nurse!");
+            return true;
+        } catch (error) {
+            console.error("Error adding nurse:", error);
+            alert("Failed to add nurse. Please try again.");
+            return false;
+        }
+    };
+
+    const encryptAndStoreData = async (resource, data, securityLevel) => {
         if (!contract || !isAuthenticated) return;
 
         try {
@@ -167,7 +241,8 @@ export const Web3Provider = ({ children }) => {
             const tx = await contract.encryptAndStoreData(
                 resource,
                 ethers.utils.keccak256(ethers.utils.toUtf8Bytes(encryptedContent)),
-                ethers.utils.keccak256(ethers.utils.toUtf8Bytes(iv))
+                ethers.utils.keccak256(ethers.utils.toUtf8Bytes(iv)),
+                securityLevel
             );
             await tx.wait();
 
@@ -223,13 +298,20 @@ export const Web3Provider = ({ children }) => {
         provider,
         isAuthenticated,
         isConnecting,
+        userRole,
+        userSecurityLevel,
         connectWallet,
+        registerUser,
+        addPatient,
+        addNurse,
         verifyUser,
         encryptAndStoreData,
         grantAccess,
         endSession,
         encryptData,
-        decryptData
+        decryptData,
+        Role,
+        SecurityLevel
     };
 
     return (
