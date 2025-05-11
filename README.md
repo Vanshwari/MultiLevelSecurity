@@ -1,29 +1,32 @@
-# Multi-Level Security System
+# IBAC - Identity-Based Access Control System
 
-A decentralized application implementing Multi-Level Security (MLS) using blockchain technology. This system provides secure data storage and access control with strong encryption mechanisms.
+A secure, blockchain-based access control system that implements identity-based authentication and encryption for data protection.
 
 ## Features
 
-- **Wallet Integration**: Connect your MetaMask wallet to interact with the system
-- **Authentication**: Secure user authentication using ECDSA signatures
-- **Data Encryption**: AES encryption for data at rest
-- **Access Control**: Granular access control for resources
-- **Session Management**: Secure session handling with automatic expiration
-- **TLS**: Secure data transmission using HTTPS
+- Wallet Integration with MetaMask
+- Identity-Based Authentication
+- AES-256-CBC Data Encryption
+- Role-Based Access Control
+- Session Management
+- Secure Data Transmission
 
 ## Architecture
 
-### Smart Contract (`MultiLevelSecurity.sol`)
-- Handles user authentication and session management
-- Manages access control lists
-- Stores encrypted data
-- Implements security policies
+### Smart Contract (IBAC.sol)
+The core of the system is the IBAC smart contract, which handles:
+- User registration and authentication
+- Session management
+- Data encryption and storage
+- Access control mechanisms
+- Resource management
 
-### Frontend (`React + ethers.js`)
-- User interface for interacting with the smart contract
-- Wallet connection and management
-- Data encryption/decryption
-- Access control management
+### Frontend Components
+- React-based user interface
+- Web3 integration
+- AES encryption implementation
+- Session management
+- Access control interface
 
 ## Prerequisites
 
@@ -102,14 +105,17 @@ A decentralized application implementing Multi-Level Security (MLS) using blockc
 ## Smart Contract Functions
 
 ### Authentication
-- `verifyCredentials(address, signature, nonce)`: Verify user credentials
-- `endSession()`: End current user session
-- `extendSession()`: Extend current session duration
+- `registerUser()`: Register a new user
+- `verifyCredentials()`: Authenticate user with ECDSA signature
+- `isAuthenticated()`: Check user authentication status
+- `endSession()`: End user session
 
 ### Data Management
-- `encryptAndStoreData(resource, encryptedContent, iv)`: Store encrypted data
-- `grantAccess(userAddress, resource, encryptedKey)`: Grant access to a resource
-- `checkAccess(userAddress, resource)`: Check if user has access to a resource
+- `encryptAndStoreData()`: Store encrypted data
+- `getResourceData()`: Retrieve encrypted data
+- `grantAccess()`: Grant access to another user
+- `revokeAccess()`: Revoke user access
+- `getUserKey()`: Get encrypted key for resource
 
 ## Frontend Components
 
@@ -182,12 +188,12 @@ For any questions or support, please open an issue in the repository.
 
 1. **Setup Remix IDE**
    - Go to [Remix IDE](https://remix.ethereum.org/)
-   - Create a new file named `MultiLevelSecurity.sol`
+   - Create a new file named `IBAC.sol`
    - Copy the contract code into the file
 
 2. **Compile Contract**
    - Select Solidity compiler version 0.8.0 or higher
-   - Click "Compile MultiLevelSecurity.sol"
+   - Click "Compile IBAC.sol"
    - Ensure there are no compilation errors
 
 3. **Deploy to Sepolia**
@@ -215,7 +221,7 @@ For any questions or support, please open an issue in the repository.
 1. **Get Contract ABI**
    - In Remix, go to the "Compile" tab
    - Click "ABI" button to copy the contract ABI
-   - Create a new file `src/contracts/MultiLevelSecurity.json`
+   - Create a new file `src/contracts/IBAC.json`
    - Paste the ABI into the file
 
 2. **Update Contract Address**
@@ -366,96 +372,4 @@ For any questions or support, please open an issue in the repository.
   - Resource-level permissions
   - Granular access management
   - Access revocation capability
-  ```solidity
-  function grantAccess(address user, string memory resource, bytes memory encryptedKey) public {
-      require(msg.sender == resources[resource].encryptedBy, "Not resource owner");
-      accessControl[user][resource] = true;
-  }
   ```
-
-### 4. Security Best Practices
-- **Input Validation**
-  - Address validation
-  - Resource name validation
-  - Timestamp validation
-  ```solidity
-  modifier validAddress(address addr) {
-      require(addr != address(0), "Invalid address");
-      _;
-  }
-  ```
-
-- **State Management**
-  - Atomic operations
-  - State consistency checks
-  - Reentrancy protection
-  ```solidity
-  modifier nonReentrant() {
-      require(!locked, "Reentrant call");
-      locked = true;
-      _;
-      locked = false;
-  }
-  ```
-
-- **Event Logging**
-  - Comprehensive event emission
-  - Audit trail maintenance
-  - Security monitoring
-  ```solidity
-  event AccessGranted(address indexed subject, string resource);
-  event AccessDenied(address indexed subject, string resource);
-  event DataEncrypted(string resource, address indexed encryptedBy);
-  event SessionExpired(address indexed user);
-  ```
-
-### 5. Gas Optimization
-- **Efficient Storage**
-  - Optimized data structures
-  - Minimal storage operations
-  - Gas-efficient mappings
-
-- **Batch Operations**
-  - Optimized for multiple operations
-  - Reduced transaction costs
-  - Efficient state updates
-
-### 6. Emergency Features
-- **Pause Mechanism**
-  - Emergency stop functionality
-  - Controlled access during emergencies
-  - Graceful degradation
-  ```solidity
-  bool private paused;
-  modifier whenNotPaused() {
-      require(!paused, "Contract is paused");
-      _;
-  }
-  ```
-
-- **Access Recovery**
-  - Admin recovery mechanism
-  - Emergency access procedures
-  - Backup authentication methods
-
-### 7. Security Auditing
-- **Code Verification**
-  - Contract verification on Etherscan
-  - Transparent code review
-  - Public audit trail
-
-- **Testing Coverage**
-  - Unit tests for all functions
-  - Integration tests
-  - Security test cases
-
-### 8. Compliance Features
-- **Data Privacy**
-  - GDPR compliance considerations
-  - Data minimization
-  - Privacy by design
-
-- **Audit Trail**
-  - Comprehensive logging
-  - Access history
-  - Change tracking

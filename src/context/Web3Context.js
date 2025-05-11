@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import contractABI from '../contracts/MultiLevelSecurity.json';
+import contractABI from '../contracts/IBAC.json';
 import CryptoJS from 'crypto-js';
 
 const Web3Context = createContext();
