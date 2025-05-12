@@ -39,7 +39,7 @@ A secure, blockchain-based access control system that implements role-based acce
 
 ## Technical Architecture
 
-### Smart Contract (IBAC.sol)
+### Smart Contract (LBAC.sol)
 ```solidity
 // Core Data Structures
 struct User {
